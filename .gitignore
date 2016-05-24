@@ -26,5 +26,8 @@ TAGS
 /project
 /target
 
+# my project controller
+.prj
+
 *.swp
 
