@@ -172,7 +172,7 @@ infixr 4 %~
   -> b
   -> a
   -> a
-(.~) lns b a = modify lns (const b) a
+(.~) = flip . set
 
 infixl 5 .~
 
@@ -300,7 +300,8 @@ compose ::
   Lens b c
   -> Lens a b
   -> Lens a c
-compose lx ly = Lens (\a b -> ly %~ (\bb -> set lx bb b) $ a) (get lx . get ly)
+compose (Lens sx gx) (Lens sy gy) = Lens (\a c -> sy a $ sx (gy a) c) (gx . gy)
+-- compose (Lens sx gx) (Lens sy gy) = Lens (liftM2 (.) sy (sx . gy)) (gx . gy)
 
 -- | An alias for @compose@.
 (|.) ::
@@ -526,5 +527,5 @@ setStreetOrState = set $ ((streetL |. addressL) ||| stateL)
 modifyCityUppercase ::
   Person
   -> Person
-modifyCityUppercase = modify (cityL |. localityL |. addressL) (map toUpper)
+modifyCityUppercase = (cityL |. localityL |. addressL) %~ (map toUpper)
 
